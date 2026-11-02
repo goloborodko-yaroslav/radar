@@ -161,19 +161,13 @@ class NewsPage(Gtk.Box):
         buttons.pack_start(open_button, False, False, 0)
         self.spinner = Gtk.Spinner()
         buttons.pack_start(self.spinner, False, False, 0)
+        self.message = Gtk.Label(xalign=0)
+        buttons.pack_start(self.message, False, False, 0)
         self.pack_start(buttons, False, False, 0)
 
         self.status = Gtk.Label(xalign=0, selectable=True)
         self.status.set_line_wrap(True)
         self.pack_start(self.status, False, False, 0)
-
-        self.output = Gtk.TextView(editable=False, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD)
-        margin(self.output, 8)
-        scroll = Gtk.ScrolledWindow()
-        scroll.add(self.output)
-        frame = Gtk.Frame()
-        frame.add(scroll)
-        self.pack_start(frame, True, True, 0)
         self.update_status()
 
     def update_status(self):
@@ -201,29 +195,18 @@ class NewsPage(Gtk.Box):
     def on_refresh(self, _button):
         self.refresh.set_sensitive(False)
         self.spinner.start()
-        self.output.get_buffer().set_text("Збираю новини…")
+        self.message.set_text("Збираю новини…")
         in_background(lambda: radar.run(notify=False, verbose=False), self.on_done)
 
     def on_done(self, result, error):
         self.refresh.set_sensitive(True)
         self.spinner.stop()
-        buffer = self.output.get_buffer()
         if error:
-            buffer.set_text(f"Помилка: {error}")
+            self.message.set_text(f"Помилка: {error}")
         elif result is None:
-            buffer.set_text("Radar саме оновлює новини за розкладом. Спробуйте за хвилину.")
+            self.message.set_text("Radar саме оновлює новини за розкладом. Спробуйте за хвилину.")
         else:
-            fresh = result["new"]
-            text = []
-            for r in result["important"]:
-                text.append(f"★ ВАЖЛИВО ({r['reason']}): {r['title']}")
-            if text:
-                text.append("")
-            text += [f"{radar.publications(len(fresh)).capitalize()} за вашими темами", ""]
-            text += [f"• [{r['source']}] {r['title']}" for r in fresh]
-            for name, err in result["errors"].items():
-                text.append(f"\n⚠ {name}: {err}")
-            buffer.set_text("\n".join(text))
+            self.message.set_text("")  # підсумок оновлення показує рядок «Останнє оновлення»
         self.update_status()
         return False
 
