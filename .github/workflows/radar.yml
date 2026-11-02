@@ -29,7 +29,7 @@ jobs:
     env:
       TZ: Europe/Kyiv
       XDG_CONFIG_HOME: ${{ github.workspace }}/config
-      XDG_DATA_HOME: ${{ runner.temp }}/data
+      XDG_DATA_HOME: ${{ github.workspace }}/.data
     steps:
       - uses: actions/checkout@v4
 
@@ -41,7 +41,7 @@ jobs:
       - name: Restore database
         uses: actions/cache/restore@v4
         with:
-          path: ${{ runner.temp }}/data/radar/radar.db
+          path: .data/radar/radar.db
           key: radar-db-${{ github.run_id }}
           restore-keys: radar-db-
 
@@ -52,7 +52,7 @@ jobs:
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: ${{ runner.temp }}/data/radar/radar.db
+          path: .data/radar/radar.db
           key: radar-db-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Prepare page
