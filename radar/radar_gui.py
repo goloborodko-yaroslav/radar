@@ -20,7 +20,8 @@ GLib.set_application_name("Radar")
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk, Gio, Gtk  # noqa: E402
+gi.require_version("GdkPixbuf", "2.0")
+from gi.repository import Gdk, GdkPixbuf, Gio, Gtk  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import radar  # noqa: E402
@@ -168,6 +169,13 @@ class NewsPage(Gtk.Box):
         self.status = Gtk.Label(xalign=0, selectable=True)
         self.status.set_line_wrap(True)
         self.pack_start(self.status, False, False, 0)
+
+        # Логотип посередині вільного місця
+        logo = Gtk.Image.new_from_pixbuf(
+            GdkPixbuf.Pixbuf.new_from_file_at_size(str(radar.ICON_FILE), 128, 128))
+        logo.set_valign(Gtk.Align.CENTER)
+        logo.set_opacity(0.9)
+        self.pack_start(logo, True, True, 0)
         self.update_status()
 
     def update_status(self):
