@@ -67,7 +67,8 @@ DEFAULT_SETTINGS = {
     "max_age_hours": 36,
     # Шукати ключі ще й у першому абзаці новини, а не лише в заголовку
     "match_summary": True,
-    # Сповіщення на робочому столі; якщо вимкнено, новини лише оновлюються на сторінці
+    # Сповіщення про свіжі новини після кожного оновлення; якщо вимкнено, новини лише
+    # оновлюються на сторінці. Ранковий підсумок вмикається окремо.
     "notifications": True,
     # Ранковий підсумок: одне сповіщення з головним за ніч
     "digest_enabled": True,
@@ -1026,7 +1027,7 @@ def run(notify=True, verbose=True, wait=False):
         print(f"Список: {REPORT_FILE}")
     if notify and near_digest(settings):
         notify = False  # за кілька хвилин прийде ранковий підсумок — він усе й покаже
-    if notify and fresh:
+    if notify and fresh and settings["notifications"]:
         notify_fresh(fresh, errors)
     return {"new": [story_summary(st) for st in fresh], "important": [story_summary(st) for st in alerts],
             "errors": errors}
@@ -1066,8 +1067,6 @@ NOTIFY_STATE = DATA_DIR / "notification.json"
 
 def send_notification(summary, body, urgency="normal"):
     """Показує сповіщення окремим процесом: він чекає на натискання, поки сповіщення лежить у треї."""
-    if not load_settings()["notifications"]:
-        return
     subprocess.Popen([sys.executable, str(APP_DIR / "radar.py"), "notify", urgency, summary, body],
                      stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                      start_new_session=True)
@@ -1562,7 +1561,7 @@ HELP = """Radar — фінансові новини з ваших видань
   radar schedule 60                 кожні 60 хвилин (або 30, 2год…)
   radar schedule 08:00 13:00 19:00  у визначений час
   radar schedule off                вимкнути автоматичне оновлення
-  radar notifications off|on        вимкнути / увімкнути сповіщення
+  radar notifications off|on        вимкнути / увімкнути сповіщення про свіжі новини
   radar digest                      надіслати ранковий підсумок зараз
 
   radar status                      стан, останній запуск, файли налаштувань
@@ -1664,7 +1663,7 @@ def cmd_status():
     nxt = next_run_text()
     if nxt:
         print(f"Наступне оновлення: {nxt}")
-    print("Сповіщення: " + ("увімкнено" if settings["notifications"] else "вимкнено"))
+    print("Сповіщення про свіжі новини: " + ("увімкнено" if settings["notifications"] else "вимкнено"))
     print("Ранковий підсумок: " + (f"щодня о {settings['digest_time']}" if settings["digest_enabled"] else "вимкнено"))
     if DB_FILE.exists():
         db = open_db()
