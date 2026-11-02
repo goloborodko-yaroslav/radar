@@ -69,8 +69,6 @@ DEFAULT_SETTINGS = {
     "match_summary": True,
     # Сповіщення на робочому столі; якщо вимкнено, новини лише оновлюються на сторінці
     "notifications": True,
-    # Сповіщати, навіть коли свіжих публікацій немає
-    "notify_when_empty": False,
     # Ранковий підсумок: одне сповіщення з головним за ніч
     "digest_enabled": True,
     "digest_time": "09:00",
@@ -98,6 +96,7 @@ def load_settings():
         pass
     settings.pop("translate", None)  # переклад тепер завжди увімкнений
     settings.pop("important_min_outlets", None)  # важливість тепер визначають самі видання
+    settings.pop("notify_when_empty", None)  # сповіщення «без змін» прибрано
     return settings
 
 
@@ -1027,7 +1026,7 @@ def run(notify=True, verbose=True, wait=False):
         print(f"Список: {REPORT_FILE}")
     if notify and near_digest(settings):
         notify = False  # за кілька хвилин прийде ранковий підсумок — він усе й покаже
-    if notify and (fresh or settings["notify_when_empty"]):
+    if notify and fresh:
         notify_fresh(fresh, errors)
     return {"new": [story_summary(st) for st in fresh], "important": [story_summary(st) for st in alerts],
             "errors": errors}
@@ -1133,10 +1132,7 @@ def bullet_list(stories, limit):
 
 
 def notify_fresh(stories, errors):
-    if stories:
-        summary, body = f"Radar · {publications(len(stories))}", bullet_list(stories, 4)
-    else:
-        summary, body = "Radar · без змін", "Свіжих публікацій за вашими темами поки немає"
+    summary, body = f"Radar · {publications(len(stories))}", bullet_list(stories, 4)
     if errors:
         body += f"\n⚠ Не вдалося отримати: {', '.join(errors)}"
     send_notification(summary, body)

@@ -18,7 +18,6 @@
   "report_days": 2,
   "max_age_hours": 36,
   "match_summary": true,
-  "notify_when_empty": false,
   "digest_enabled": false,
   "digest_time": "09:00"
 }

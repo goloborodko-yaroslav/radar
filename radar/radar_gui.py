@@ -562,9 +562,6 @@ class SchedulePage(Gtk.Box):
         self.notifications.set_active(settings["notifications"])
         self.notifications.connect("toggled", self.on_notifications_toggled)
         self.pack_start(self.notifications, False, False, 0)
-        self.empty = Gtk.CheckButton(label="Показувати сповіщення, навіть коли свіжих публікацій немає")
-        self.empty.set_active(settings["notify_when_empty"])
-        self.pack_start(self.empty, False, False, 0)
 
         self.digest = Gtk.CheckButton(label="Ранковий підсумок — одне сповіщення з головним за ніч, щодня о")
         self.digest.set_active(settings["digest_enabled"])
@@ -585,8 +582,7 @@ class SchedulePage(Gtk.Box):
         self.pack_start(self.result, False, False, 0)
 
     def on_notifications_toggled(self, button):
-        # Без сповіщень решта їхніх параметрів не діє
-        self.empty.set_sensitive(button.get_active())
+        # Без сповіщень ранковий підсумок не діє
         self.digest_row.set_sensitive(button.get_active())
 
     def on_apply(self, _button):
@@ -607,7 +603,6 @@ class SchedulePage(Gtk.Box):
         settings["report_days"] = int(self.days.get_value())
         settings["match_summary"] = self.summary.get_active()
         settings["notifications"] = self.notifications.get_active()
-        settings["notify_when_empty"] = self.empty.get_active()
         digest_time = re.fullmatch(r"\s*(\d{1,2}):(\d\d)\s*", self.digest_time.get_text())
         if self.digest.get_active() and not (digest_time and int(digest_time[1]) < 24 and int(digest_time[2]) < 60):
             message(self.window, "Вкажіть час підсумку у форматі 09:00", Gtk.MessageType.WARNING)
