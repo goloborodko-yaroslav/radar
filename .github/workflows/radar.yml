@@ -1,0 +1,70 @@
+# Radar у хмарі: щогодини збирає новини й публікує сторінку на GitHub Pages.
+# Видання, теми й параметри — у теці config/radar. Після їх зміни оновлення запускається одразу.
+name: Radar
+
+on:
+  schedule:
+    - cron: "7 * * * *"        # щогодини о :07 (GitHub іноді запускає на кілька хвилин пізніше)
+  workflow_dispatch:            # кнопка «Run workflow» — оновити вручну
+  push:
+    branches: [main]
+    paths: ["config/**", "radar/**", ".github/workflows/**"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: radar
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      TZ: Europe/Kyiv
+      XDG_CONFIG_HOME: ${{ github.workspace }}/config
+      XDG_DATA_HOME: ${{ runner.temp }}/data
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # База Radar (що вже бачили, переклади, позначки «важливо») зберігається між запусками
+      - name: Restore database
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/data/radar/radar.db
+          key: radar-db-${{ github.run_id }}
+          restore-keys: radar-db-
+
+      - name: Collect news
+        run: python3 radar/radar.py run --no-notify
+
+      - name: Save database
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/data/radar/radar.db
+          key: radar-db-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Prepare page
+        run: |
+          mkdir -p site
+          cp "$XDG_DATA_HOME/radar/report.html" site/index.html
+          touch site/.nojekyll
+          tail -n 20 "$XDG_DATA_HOME/radar/radar.log" || true
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

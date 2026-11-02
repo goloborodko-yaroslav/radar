@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Мінфін",
+    "url": "https://minfin.com.ua/ua/news/",
+    "type": "html",
+    "link_regex": "/ua/\\d{4}/\\d{2}/\\d{2}/\\d+/?$",
+    "enabled": true,
+    "top_page": true,
+    "top_verify": {
+      "require": "wrapper-authors",
+      "reject": "youtube.com/embed"
+    }
+  },
+  {
+    "name": "Forbes Україна",
+    "url": "https://forbes.ua/news",
+    "type": "html",
+    "link_regex": "forbes\\.ua/news/[a-z0-9-]+$",
+    "enabled": true,
+    "top_page": true
+  },
+  {
+    "name": "Економічна правда",
+    "url": "https://epravda.com.ua/news/",
+    "type": "rss",
+    "feeds": [
+      "https://www.epravda.com.ua/rss/view_news/"
+    ],
+    "enabled": true,
+    "top_page": true
+  },
+  {
+    "name": "LIGA.Фінанси",
+    "url": "https://finance.liga.net/ua/novosti",
+    "type": "rss",
+    "feeds": [
+      "https://finance.liga.net/ua/export/all/rss.xml"
+    ],
+    "enabled": true,
+    "top_page": true
+  },
+  {
+    "name": "НВ Бізнес",
+    "url": "https://biz.nv.ua/ukr/finance.html",
+    "type": "rss",
+    "feeds": [
+      "https://nv.ua/ukr/rss/all.xml"
+    ],
+    "link_contains": "biz.nv.ua",
+    "enabled": true
+  },
+  {
+    "name": "Mind",
+    "url": "https://mind.ua/finance",
+    "type": "rss",
+    "feeds": [
+      "https://mind.ua/feed"
+    ],
+    "enabled": true,
+    "top_page": true
+  },
+  {
+    "name": "Кошт",
+    "url": "https://kosht.media/all-news/",
+    "type": "rss",
+    "feeds": [
+      "https://kosht.media/feed/"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Bloomberg",
+    "url": "https://www.bloomberg.com/latest",
+    "type": "rss",
+    "feeds": [
+      "https://feeds.bloomberg.com/markets/news.rss",
+      "https://feeds.bloomberg.com/economics/news.rss",
+      "https://feeds.bloomberg.com/crypto/news.rss",
+      "https://feeds.bloomberg.com/industries/news.rss"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Reuters",
+    "url": "https://www.reuters.com/",
+    "type": "rss",
+    "feeds": [
+      "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+    ],
+    "enabled": true
+  }
+]

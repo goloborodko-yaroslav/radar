@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar — фінансові новини</title>
+<link rel="icon" type="image/svg+xml" href="__FAVICON__">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f4f4f4; --card: #ffffff; --text: #0a0a0a; --muted: #6b6b6b; --line: #e2e2e2;
+  --accent: #000000; --on-accent: #ffffff; --new: #000000; --fresh: #f0f0f0;
+  --tag: #efefef; --visited: #8a8a8a; --imp-bg: #000000; --imp-text: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000; --card: #0c0c0c; --text: #f2f2f2; --muted: #8c8c8c; --line: #222222;
+    --accent: #ffffff; --on-accent: #000000; --new: #ffffff; --fresh: #141414;
+    --tag: #1a1a1a; --visited: #6e6e6e; --imp-bg: #ffffff; --imp-text: #000000;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+       font: 16px/1.45 "Ubuntu", "Noto Sans", system-ui, sans-serif; }
+button { font: inherit; color: inherit; }
+header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+.top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 0 10px; }
+h1 { margin: 0; font-size: 22px; letter-spacing: .5px; display: flex; align-items: center; gap: 10px; }
+h1 svg { width: 30px; height: 30px; }
+.stamp { color: var(--muted); font-size: 14px; }
+.tabs { display: flex; gap: 4px; margin-left: auto; background: var(--card); border: 1px solid var(--line);
+        border-radius: 10px; padding: 3px; }
+.tab { border: 0; background: none; padding: 5px 14px; border-radius: 7px; cursor: pointer; font-size: 15px; }
+.tab.on { background: var(--accent); color: var(--on-accent); }
+.tab .n { opacity: .7; font-size: 13px; margin-left: 4px; }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; padding-bottom: 10px; align-items: center; }
+input[type=search] { flex: 1 1 240px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line);
+                     background: var(--card); color: var(--text); font: inherit; }
+.toggle { border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 7px 12px;
+          cursor: pointer; font-size: 14px; }
+.toggle.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 0 0; }
+.chip { border: 1px solid var(--line); background: var(--card); border-radius: 999px;
+        padding: 3px 11px; font-size: 13px; cursor: pointer; }
+.chip:hover { border-color: var(--muted); }
+.chip.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin: 24px 0 8px; }
+details.cat { margin-top: 14px; }
+details.cat > summary { cursor: pointer; list-style: none; font-weight: 600; padding: 8px 2px; display: flex; gap: 8px; align-items: baseline; }
+details.cat > summary::-webkit-details-marker { display: none; }
+details.cat > summary::before { content: "▸"; color: var(--muted); width: 12px; }
+details.cat[open] > summary::before { content: "▾"; }
+details.cat > summary .n { color: var(--muted); font-weight: 400; font-size: 14px; }
+ol { list-style: none; margin: 0; padding: 0; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.item { display: flex; gap: 14px; padding: 10px 12px 10px 14px; border-top: 1px solid var(--line); }
+.item:first-child { border-top: 0; }
+.item time { flex: 0 0 44px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.item .body { flex: 1; min-width: 0; }
+.item a.title { color: var(--text); text-decoration: none; font-weight: 500; }
+.item a.title:hover { text-decoration: underline; text-underline-offset: 3px; }
+.item.read a.title { color: var(--visited); font-weight: 400; }
+.meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 3px; font-size: 13px; color: var(--muted); }
+.meta b { font-weight: 600; margin-right: 2px; }
+.meta .tag { background: var(--tag); border-radius: 4px; padding: 0 6px; }
+.meta .also a { color: var(--muted); }
+.meta .also a:hover { color: var(--text); }
+.imp { display: inline-block; background: var(--imp-bg); color: var(--imp-text); font-size: 11px; font-weight: 700;
+       letter-spacing: .5px; text-transform: uppercase; border-radius: 4px; padding: 1px 6px; margin-right: 6px;
+       vertical-align: 2px; }
+.why { font-size: 12px; }
+.hide { flex: 0 0 auto; align-self: flex-start; border: 0; background: none; color: var(--muted); cursor: pointer;
+        font-size: 18px; line-height: 1; padding: 2px 4px; border-radius: 6px; opacity: .45; }
+.item:hover .hide { opacity: 1; }
+.hide:hover { background: var(--tag); color: var(--text); }
+.item.is-hidden { opacity: .45; }
+.item.fresh { box-shadow: inset 3px 0 0 var(--new); background: var(--fresh); }
+.item.fresh time { color: var(--new); font-weight: 700; }
+.warn { color: var(--muted); font-size: 14px; border-left: 3px solid var(--muted); padding-left: 10px; }
+.empty, footer { color: var(--muted); }
+.empty { padding: 24px 4px; }
+footer { font-size: 13px; padding: 24px 0 40px; }
+@media (max-width: 560px) {
+  .tabs { margin-left: 0; width: 100%; }
+  .tab { flex: 1; padding: 5px 6px; }
+  .item { gap: 10px; padding: 10px; }
+  .item time { flex-basis: 38px; font-size: 14px; }
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="top">
+    <h1>__LOGO__Radar</h1>
+    <span class="stamp">Оновлено __UPDATED__ · за __DAYS__</span>
+    <nav class="tabs">
+      <button class="tab on" data-view="feed">Стрічка<span class="n" id="n-feed"></span></button>
+      <button class="tab" data-view="important">Важливе<span class="n" id="n-important"></span></button>
+      <button class="tab" data-view="topics">За темами</button>
+    </nav>
+  </div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="Пошук у заголовках…">
+    <button class="toggle" id="hide-read" title="Не показувати новини, які ви вже відкривали">Сховати прочитані</button>
+    <button class="toggle" id="show-hidden" hidden></button>
+  </div>
+</div></header>
+<main class="wrap">
+<div class="chips" id="chips"></div>
+__WARN__
+<div id="list"></div>
+<footer>Смужкою зліва позначено новини, яких ви ще не бачили. «Важливо» — новина, яку саме видання подає
+як головну: виділяє на сайті, ставить на головну сторінку або позначає «терміново». ✕ — сховати новину.
+Наведіть мишку на перекладений заголовок, щоб побачити оригінал. Щоб оновити сторінку, натисніть F5.</footer>
+</main>
+<script>
+var STORIES = __DATA__;
+var SOURCES = __SOURCES__;
+var CATEGORIES = __CATEGORIES__;
+
+(function () {
+  function load(key, fallback) {
+    try { var v = JSON.parse(localStorage.getItem(key)); return v === null ? fallback : v; } catch (e) { return fallback; }
+  }
+  function save(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} }
+  function trimmed(list) { return list.slice(-4000); }
+
+  var state = {
+    view: load('radar-view', 'feed'),
+    hideRead: load('radar-hide-read', false),
+    showHidden: false,
+    sources: new Set(),
+    query: ''
+  };
+  var read = new Set(load('radar-read', []));
+  var hidden = new Set(load('radar-hidden', []));
+  var lastVisit = load('radar-last-visit', null);
+  save('radar-last-visit', Math.floor(Date.now() / 1000));
+
+  STORIES.forEach(function (s) {
+    s.fresh = lastVisit ? s.seen > lastVisit : s.latest;
+    s.text = (s.t + ' ' + (s.o || '') + ' ' + s.all.join(' ') + ' ' + s.tags.join(' ')).toLowerCase();
+  });
+
+  function anyIn(set, links) { return links.some(function (l) { return set.has(l); }); }
+  function isRead(s) { return anyIn(read, s.links); }
+  function isHidden(s) { return anyIn(hidden, s.links); }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function row(s) {
+    var li = el('li', 'item');
+    if (s.fresh) li.classList.add('fresh');
+    if (isRead(s)) li.classList.add('read');
+    if (isHidden(s)) li.classList.add('is-hidden');
+    li.appendChild(el('time', '', s.time));
+    var body = el('div', 'body');
+    var head = el('div');
+    if (s.imp) head.appendChild(el('span', 'imp', 'Важливо'));
+    var a = el('a', 'title', s.t);
+    a.href = s.u; a.target = '_blank'; a.rel = 'noopener';
+    if (s.o) a.title = s.o;
+    a.addEventListener('click', function () { markRead(s, li); });
+    a.addEventListener('auxclick', function () { markRead(s, li); });
+    head.appendChild(a);
+    body.appendChild(head);
+    var meta = el('div', 'meta');
+    meta.appendChild(el('b', '', s.s));
+    if (s.also.length) {
+      var also = el('span', 'also', 'також: ');
+      s.also.forEach(function (x, i) {
+        if (i) also.appendChild(document.createTextNode(' · '));
+        var l = el('a', '', x.s); l.href = x.u; l.target = '_blank'; l.rel = 'noopener';
+        if (x.t) l.title = x.t;
+        l.addEventListener('click', function () { markRead(s, li); });
+        also.appendChild(l);
+      });
+      meta.appendChild(also);
+    }
+    s.tags.forEach(function (t) { meta.appendChild(el('span', 'tag', t)); });
+    if (s.imp) meta.appendChild(el('span', 'why', '· ' + s.why));
+    body.appendChild(meta);
+    li.appendChild(body);
+    var x = el('button', 'hide', isHidden(s) ? '↺' : '✕');
+    x.title = isHidden(s) ? 'Повернути' : 'Сховати';
+    x.addEventListener('click', function () { toggleHidden(s); });
+    li.appendChild(x);
+    return li;
+  }
+
+  function markRead(s, li) {
+    s.links.forEach(function (l) { read.add(l); });
+    save('radar-read', trimmed(Array.from(read)));
+    li.classList.add('read');
+  }
+  function toggleHidden(s) {
+    if (isHidden(s)) s.links.forEach(function (l) { hidden.delete(l); });
+    else s.links.forEach(function (l) { hidden.add(l); });
+    save('radar-hidden', trimmed(Array.from(hidden)));
+    render();
+  }
+
+  function visible(s) {
+    if (isHidden(s) && !state.showHidden) return false;
+    if (state.hideRead && isRead(s)) return false;
+    if (state.sources.size && !s.all.some(function (x) { return state.sources.has(x); })) return false;
+    if (state.query && s.text.indexOf(state.query) === -1) return false;
+    return true;
+  }
+
+  function byDay(list, container) {
+    var day = null, ol = null;
+    list.forEach(function (s) {
+      if (s.day !== day) {
+        day = s.day;
+        container.appendChild(el('h2', '', day));
+        ol = el('ol');
+        container.appendChild(ol);
+      }
+      ol.appendChild(row(s));
+    });
+  }
+
+  function render() {
+    var box = document.getElementById('list');
+    box.textContent = '';
+    var shown = STORIES.filter(visible);
+    var important = shown.filter(function (s) { return s.imp; });
+    document.getElementById('n-feed').textContent = shown.length;
+    document.getElementById('n-important').textContent = important.length;
+
+    if (state.view === 'feed') byDay(shown, box);
+    if (state.view === 'important') byDay(important, box);
+    if (state.view === 'topics') {
+      var openCats = new Set(load('radar-open-cats', []));
+      CATEGORIES.forEach(function (cat) {
+        var list = shown.filter(function (s) { return s.cat === cat; });
+        if (!list.length) return;
+        var d = el('details', 'cat');
+        d.open = openCats.has(cat);
+        var sum = el('summary', '', cat);
+        sum.appendChild(el('span', 'n', list.length));
+        d.appendChild(sum);
+        var ol = el('ol');
+        list.forEach(function (s) { ol.appendChild(row(s)); });
+        d.appendChild(ol);
+        d.addEventListener('toggle', function () {
+          if (d.open) openCats.add(cat); else openCats.delete(cat);
+          save('radar-open-cats', Array.from(openCats));
+        });
+        box.appendChild(d);
+      });
+    }
+    if (!box.children.length) {
+      box.appendChild(el('p', 'empty', state.view === 'important'
+        ? 'Важливих подій за цей період немає.' : 'Нічого не знайдено.'));
+    }
+
+    var hiddenCount = STORIES.filter(isHidden).length;
+    var sh = document.getElementById('show-hidden');
+    sh.hidden = !hiddenCount;
+    sh.textContent = (state.showHidden ? 'Не показувати приховані' : 'Показати приховані') + ' (' + hiddenCount + ')';
+    sh.classList.toggle('on', state.showHidden);
+    document.getElementById('hide-read').classList.toggle('on', state.hideRead);
+    document.querySelectorAll('.tab').forEach(function (t) { t.classList.toggle('on', t.dataset.view === state.view); });
+  }
+
+  var chips = document.getElementById('chips');
+  SOURCES.forEach(function (name) {
+    var b = el('button', 'chip', name);
+    b.addEventListener('click', function () {
+      if (state.sources.has(name)) state.sources.delete(name); else state.sources.add(name);
+      b.classList.toggle('on');
+      render();
+    });
+    chips.appendChild(b);
+  });
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.addEventListener('click', function () { state.view = t.dataset.view; save('radar-view', state.view); render(); });
+  });
+  document.getElementById('q').addEventListener('input', function (e) {
+    state.query = e.target.value.trim().toLowerCase(); render();
+  });
+  document.getElementById('hide-read').addEventListener('click', function () {
+    state.hideRead = !state.hideRead; save('radar-hide-read', state.hideRead); render();
+  });
+  document.getElementById('show-hidden').addEventListener('click', function () {
+    state.showHidden = !state.showHidden; render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
