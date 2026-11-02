@@ -516,13 +516,25 @@ def scrape_html(source):
 
 
 def fetch_source(source):
-    if source.get("type") == "html":
-        items = scrape_html(source)
-    else:
+    try:
+        if source.get("type") == "html":
+            items = scrape_html(source)
+        else:
+            items = []
+            for feed in source.get("feeds", []):
+                data, _ = http_get(feed)
+                items.extend(parse_feed(data))
+    except urllib.error.HTTPError as error:
+        # Деякі сайти не пускають запити з серверів (наприклад, з GitHub). Тоді беремо
+        # заголовки видання із запасних стрічок — зазвичай через Google News.
+        if error.code not in (401, 403, 429) or not source.get("fallback_feeds"):
+            raise
+        log(f"{source['name']}: сайт заблокував запит ({error.code}), беру запасні стрічки")
         items = []
-        for feed in source.get("feeds", []):
+        for feed in source["fallback_feeds"]:
             data, _ = http_get(feed)
             items.extend(parse_feed(data))
+        return items
     if source.get("link_contains"):
         items = [i for i in items if source["link_contains"] in i["link"]]
     return items
