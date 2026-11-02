@@ -67,6 +67,8 @@ DEFAULT_SETTINGS = {
     "max_age_hours": 36,
     # Шукати ключі ще й у першому абзаці новини, а не лише в заголовку
     "match_summary": True,
+    # Сповіщення на робочому столі; якщо вимкнено, новини лише оновлюються на сторінці
+    "notifications": True,
     # Сповіщати, навіть коли свіжих публікацій немає
     "notify_when_empty": False,
     # Ранковий підсумок: одне сповіщення з головним за ніч
@@ -1065,6 +1067,8 @@ NOTIFY_STATE = DATA_DIR / "notification.json"
 
 def send_notification(summary, body, urgency="normal"):
     """Показує сповіщення окремим процесом: він чекає на натискання, поки сповіщення лежить у треї."""
+    if not load_settings()["notifications"]:
+        return
     subprocess.Popen([sys.executable, str(APP_DIR / "radar.py"), "notify", urgency, summary, body],
                      stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                      start_new_session=True)
@@ -1562,6 +1566,7 @@ HELP = """Radar — фінансові новини з ваших видань
   radar schedule 60                 кожні 60 хвилин (або 30, 2год…)
   radar schedule 08:00 13:00 19:00  у визначений час
   radar schedule off                вимкнути автоматичне оновлення
+  radar notifications off|on        вимкнути / увімкнути сповіщення
   radar digest                      надіслати ранковий підсумок зараз
 
   radar status                      стан, останній запуск, файли налаштувань
@@ -1663,6 +1668,7 @@ def cmd_status():
     nxt = next_run_text()
     if nxt:
         print(f"Наступне оновлення: {nxt}")
+    print("Сповіщення: " + ("увімкнено" if settings["notifications"] else "вимкнено"))
     print("Ранковий підсумок: " + (f"щодня о {settings['digest_time']}" if settings["digest_enabled"] else "вимкнено"))
     if DB_FILE.exists():
         db = open_db()
@@ -1701,6 +1707,11 @@ def main(argv):
         cmd_topic(args)
     elif command == "schedule":
         set_schedule(args)
+    elif command == "notifications" and args and args[0] in ("on", "off"):
+        settings = load_settings()
+        settings["notifications"] = args[0] == "on"
+        save_settings(settings)
+        print("Сповіщення " + ("увімкнено" if settings["notifications"] else "вимкнено"))
     elif command == "status":
         cmd_status()
     else:

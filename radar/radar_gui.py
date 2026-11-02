@@ -179,6 +179,8 @@ class NewsPage(Gtk.Box):
     def update_status(self):
         settings = radar.load_settings()
         lines = [f"<b>Розклад:</b> {radar.describe_schedule(settings)}"]
+        if not settings["notifications"]:
+            lines.append("<b>Сповіщення:</b> вимкнено")
         if settings["digest_enabled"]:
             lines.append(f"<b>Ранковий підсумок:</b> щодня о {settings['digest_time']}")
         nxt = radar.next_run_text()
@@ -553,12 +555,16 @@ class SchedulePage(Gtk.Box):
         self.summary = Gtk.CheckButton(label="Шукати ключові слова також у першому абзаці новини")
         self.summary.set_active(settings["match_summary"])
         self.pack_start(self.summary, False, False, 0)
-        self.empty = Gtk.CheckButton(label="Показувати сповіщення, навіть коли свіжих публікацій немає")
-        self.empty.set_active(settings["notify_when_empty"])
-        self.pack_start(self.empty, False, False, 0)
 
         self.pack_start(Gtk.Separator(), False, False, 6)
 
+        self.notifications = Gtk.CheckButton(label="Сповіщення на робочому столі")
+        self.notifications.set_active(settings["notifications"])
+        self.notifications.connect("toggled", self.on_notifications_toggled)
+        self.pack_start(self.notifications, False, False, 0)
+        self.empty = Gtk.CheckButton(label="Показувати сповіщення, навіть коли свіжих публікацій немає")
+        self.empty.set_active(settings["notify_when_empty"])
+        self.pack_start(self.empty, False, False, 0)
 
         self.digest = Gtk.CheckButton(label="Ранковий підсумок — одне сповіщення з головним за ніч, щодня о")
         self.digest.set_active(settings["digest_enabled"])
@@ -567,6 +573,8 @@ class SchedulePage(Gtk.Box):
         row.pack_start(self.digest, False, False, 0)
         row.pack_start(self.digest_time, False, False, 0)
         self.pack_start(row, False, False, 0)
+        self.digest_row = row
+        self.on_notifications_toggled(self.notifications)
 
         apply = Gtk.Button(label="Зберегти")
         apply.get_style_context().add_class("suggested-action")
@@ -575,6 +583,11 @@ class SchedulePage(Gtk.Box):
         self.pack_start(apply, False, False, 6)
         self.result = Gtk.Label(xalign=0)
         self.pack_start(self.result, False, False, 0)
+
+    def on_notifications_toggled(self, button):
+        # Без сповіщень решта їхніх параметрів не діє
+        self.empty.set_sensitive(button.get_active())
+        self.digest_row.set_sensitive(button.get_active())
 
     def on_apply(self, _button):
         settings = radar.load_settings()
@@ -593,6 +606,7 @@ class SchedulePage(Gtk.Box):
         settings["interval_minutes"] = int(self.minutes.get_value())
         settings["report_days"] = int(self.days.get_value())
         settings["match_summary"] = self.summary.get_active()
+        settings["notifications"] = self.notifications.get_active()
         settings["notify_when_empty"] = self.empty.get_active()
         digest_time = re.fullmatch(r"\s*(\d{1,2}):(\d\d)\s*", self.digest_time.get_text())
         if self.digest.get_active() and not (digest_time and int(digest_time[1]) < 24 and int(digest_time[2]) < 60):
