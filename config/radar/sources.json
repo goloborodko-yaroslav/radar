@@ -366,5 +366,32 @@
     "enabled": true,
     "all_news": true,
     "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "Інтерфакс-Україна",
+    "url": "https://ua.interfax.com.ua/news/economic.rss",
+    "type": "rss",
+    "feeds": [
+      "https://ua.interfax.com.ua/news/economic.rss"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Укрінформ: економіка",
+    "url": "https://www.ukrinform.ua/rss/rubric-economy",
+    "type": "rss",
+    "feeds": [
+      "https://www.ukrinform.ua/rss/rubric-economy"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "The Page",
+    "url": "https://thepage.ua/ua/rss",
+    "type": "rss",
+    "feeds": [
+      "https://thepage.ua/ua/rss"
+    ],
+    "enabled": true
   }
 ]

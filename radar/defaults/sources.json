@@ -5,6 +5,7 @@
     "type": "html",
     "link_regex": "/ua/\\d{4}/\\d{2}/\\d{2}/\\d+/?$",
     "enabled": true,
+    "all_news": true,
     "top_page": true,
     "top_verify": {
       "require": "wrapper-authors",
@@ -58,14 +59,13 @@
     "enabled": true
   },
   {
-    "name": "Mind",
-    "url": "https://mind.ua/finance",
+    "name": "Цензор.НЕТ",
+    "url": "https://censor.net/biz",
     "type": "rss",
     "feeds": [
-      "https://mind.ua/feed"
+      "https://censor.net/includes/news_uk.xml"
     ],
-    "enabled": true,
-    "top_page": true
+    "enabled": true
   },
   {
     "name": "Кошт",
@@ -93,7 +93,304 @@
     "url": "https://www.reuters.com/",
     "type": "rss",
     "feeds": [
-      "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+      "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en",
+      "https://www.bing.com/news/search?q=site%3Areuters.com+business&format=rss",
+      "https://www.bing.com/news/search?q=site%3Areuters.com+markets&format=rss",
+      "https://www.bing.com/news/search?q=site%3Areuters.com+finance&format=rss",
+      "https://www.bing.com/news/search?q=site%3Areuters.com+economy&format=rss",
+      "https://www.bing.com/news/search?q=site%3Areuters.com+technology&format=rss",
+      "https://www.bing.com/news/search?q=site%3Areuters.com&format=rss"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "FT",
+    "url": "https://www.ft.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.ft.com/markets?format=rss",
+      "https://www.ft.com/companies?format=rss",
+      "https://www.ft.com/global-economy?format=rss",
+      "https://www.ft.com/rss/home/international"
+    ],
+    "enabled": true,
+    "top_feeds": [
+      "https://www.ft.com/rss/home/international"
+    ]
+  },
+  {
+    "name": "WSJ",
+    "url": "https://www.wsj.com/",
+    "type": "rss",
+    "feeds": [
+      "https://feeds.content.dowjones.io/public/rss/RSSMarketsMain",
+      "https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "BBC Business",
+    "url": "https://www.bbc.com/",
+    "type": "rss",
+    "feeds": [
+      "https://feeds.bbci.co.uk/news/business/rss.xml"
+    ],
+    "enabled": true,
+    "top_feeds": [
+      "https://feeds.bbci.co.uk/news/rss.xml"
+    ]
+  },
+  {
+    "name": "Euronews Business",
+    "url": "https://euronews.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.euronews.com/rss?level=vertical&name=business"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Fortune",
+    "url": "https://fortune.com/",
+    "type": "rss",
+    "feeds": [
+      "https://fortune.com/feed/"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "NYT",
+    "url": "https://www.nytimes.com/",
+    "type": "rss",
+    "feeds": [
+      "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+      "https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml",
+      "https://rss.nytimes.com/services/xml/rss/nyt/YourMoney.xml",
+      "https://rss.nytimes.com/services/xml/rss/nyt/Dealbook.xml"
+    ],
+    "enabled": true,
+    "top_feeds": [
+      "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"
+    ]
+  },
+  {
+    "name": "The Guardian",
+    "url": "https://www.theguardian.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.theguardian.com/business/rss",
+      "https://www.theguardian.com/money/rss",
+      "https://www.theguardian.com/business/economics/rss"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Business Insider",
+    "url": "https://www.businessinsider.com/",
+    "type": "rss",
+    "feeds": [
+      "https://feeds.businessinsider.com/custom/all"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Inc.",
+    "url": "https://www.inc.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.inc.com/rss/"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Fast Company",
+    "url": "https://www.fastcompany.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.fastcompany.com/latest/rss",
+      "https://www.fastcompany.com/section/careers/rss",
+      "https://www.fastcompany.com/section/leadership/rss"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Futurism",
+    "url": "https://futurism.com/",
+    "type": "rss",
+    "feeds": [
+      "https://futurism.com/feed"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "dev.ua",
+    "url": "https://dev.ua/",
+    "type": "rss",
+    "feeds": [
+      "https://dev.ua/rss"
+    ],
+    "enabled": true,
+    "top_categories": [
+      "Гаряченьке"
+    ]
+  },
+  {
+    "name": "The Hacker News",
+    "url": "https://thehackernews.com/",
+    "type": "rss",
+    "feeds": [
+      "https://feeds.feedburner.com/TheHackersNews"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Engadget (gdgt)",
+    "url": "https://gdgt.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.engadget.com/feed/"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "WIRED",
+    "url": "https://www.wired.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.wired.com/feed/rss"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "TechCrunch",
+    "url": "https://techcrunch.com/",
+    "type": "rss",
+    "feeds": [
+      "https://techcrunch.com/feed/"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "The Verge",
+    "url": "https://www.theverge.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.theverge.com/rss/index.xml"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "CoinDesk",
+    "url": "https://www.coindesk.com/",
+    "type": "rss",
+    "feeds": [
+      "https://www.coindesk.com/arc/outboundfeeds/rss/"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "The Defiant",
+    "url": "https://thedefiant.io/",
+    "type": "rss",
+    "feeds": [
+      "https://thedefiant.io/api/feed"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "Crypto Briefing",
+    "url": "https://cryptobriefing.com/",
+    "type": "rss",
+    "feeds": [
+      "https://cryptobriefing.com/feed/"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "The Block",
+    "url": "https://www.theblock.co/",
+    "type": "rss",
+    "feeds": [
+      "https://www.theblock.co/rss.xml"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "Cointelegraph",
+    "url": "https://cointelegraph.com/",
+    "type": "rss",
+    "feeds": [
+      "https://cointelegraph.com/rss"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "Wu Blockchain",
+    "url": "https://www.wublockchain.xyz/",
+    "type": "rss",
+    "feeds": [
+      "https://www.wublockchain.xyz/feed"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "BeInCrypto",
+    "url": "https://beincrypto.com/",
+    "type": "rss",
+    "feeds": [
+      "https://beincrypto.com/feed/"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "Protos",
+    "url": "https://protos.com/",
+    "type": "rss",
+    "feeds": [
+      "https://protos.com/feed/"
+    ],
+    "enabled": true,
+    "all_news": true,
+    "all_news_topic": "Криптовалюти"
+  },
+  {
+    "name": "Інтерфакс-Україна",
+    "url": "https://ua.interfax.com.ua/news/economic.rss",
+    "type": "rss",
+    "feeds": [
+      "https://ua.interfax.com.ua/news/economic.rss"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "Укрінформ: економіка",
+    "url": "https://www.ukrinform.ua/rss/rubric-economy",
+    "type": "rss",
+    "feeds": [
+      "https://www.ukrinform.ua/rss/rubric-economy"
+    ],
+    "enabled": true
+  },
+  {
+    "name": "The Page",
+    "url": "https://thepage.ua/ua/rss",
+    "type": "rss",
+    "feeds": [
+      "https://thepage.ua/ua/rss"
     ],
     "enabled": true
   }
