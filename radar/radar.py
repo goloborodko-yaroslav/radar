@@ -13,6 +13,7 @@
     radar topic add "Тема: ключ1, ключ2"
     radar topic remove НАЗВА
     radar schedule [60 | 08:00 13:00 19:00 | off]
+    radar dashboard            відкрити дашборд: валюти, ставка, ринки, крипта
     radar status
 """
 
@@ -30,9 +31,11 @@ import json
 import os
 import re
 import shutil
+import socket
 import sqlite3
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -81,7 +84,7 @@ DEFAULT_SETTINGS = {
 def ensure_config():
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    for name in ("sources.json", "topics.txt"):
+    for name in ("sources.json", "topics.txt", "dashboard.json"):
         target = CONFIG_DIR / name
         if not target.exists():
             shutil.copy(APP_DIR / "defaults" / name, target)
@@ -821,6 +824,31 @@ def stories_for(db, since, sources_all, topics, settings):
 
 # ---------------------------------------------------------------- запуск
 
+NETWORK_WAIT = 180  # секунд чекати на інтернет перед оновленням
+
+
+def network_ready():
+    """Чи працює інтернет: чи вдається знайти адресу хоча б одного великого сайту."""
+    for host in ("www.google.com", "www.cloudflare.com", "bank.gov.ua"):
+        try:
+            socket.getaddrinfo(host, 443)
+            return True
+        except OSError:
+            continue
+    return False
+
+
+def wait_for_network(timeout=NETWORK_WAIT):
+    """Чекає на інтернет до timeout секунд. Після сну ноутбука таймер спрацьовує раніше,
+    ніж підключається Wi-Fi; без цього оновлення дало б помилку від кожного видання."""
+    deadline = time.monotonic() + timeout
+    while not network_ready():
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(10)
+    return True
+
+
 def run(notify=True, verbose=True, wait=False):
     ensure_config()
     lock = open(LOCK_FILE, "w")
@@ -829,6 +857,13 @@ def run(notify=True, verbose=True, wait=False):
     except BlockingIOError:
         if verbose:
             print("Radar вже оновлює новини — зачекайте хвилину.")
+        return None
+
+    if not wait_for_network():
+        # Без інтернету нічого не оновлюємо: сторінка лишається з останніми новинами
+        log("немає інтернету — оновлення пропущено")
+        if verbose:
+            print("Немає інтернету — оновлення пропущено, сторінка лишилася як була.")
         return None
 
     settings = load_settings()
@@ -1011,6 +1046,12 @@ def run(notify=True, verbose=True, wait=False):
 
     write_report(db, settings, errors, sources_all, topics)
     db.close()
+
+    try:
+        import dashboard  # валюти, ставка, ринки — окрема сторінка; збій не заважає новинам
+        dashboard.update(CONFIG_DIR, DATA_DIR, log)
+    except Exception as error:
+        log(f"дашборд: {error}")
 
     log(f"запуск {run_id}: отримано {sum(len(v) for v in fetched.values())}, нових посилань {added},"
         f" нових сюжетів {len(fresh)}, важливих {len(alerts)}, помилок {len(errors)}")
@@ -1229,6 +1270,18 @@ def write_report(db, settings, errors, sources, topics=None):
     tmp = REPORT_FILE.with_suffix(".tmp")
     tmp.write_text(page, encoding="utf-8")
     tmp.replace(REPORT_FILE)
+
+
+def open_dashboard():
+    """Відкриває дашборд; якщо його ще немає або дані старші за годину — спершу оновлює."""
+    ensure_config()
+    import dashboard
+    target = DATA_DIR / "dashboard.html"
+    stale = not target.exists() or dt.datetime.now().timestamp() - target.stat().st_mtime > 3600
+    if stale:
+        dashboard.update(CONFIG_DIR, DATA_DIR, log)
+    import webbrowser
+    webbrowser.open(target.as_uri())
 
 
 def open_report():
@@ -1564,6 +1617,7 @@ HELP = """Radar — фінансові новини з ваших видань
   radar notifications off|on        вимкнути / увімкнути сповіщення про свіжі новини
   radar digest                      надіслати ранковий підсумок зараз
 
+  radar dashboard                   відкрити дашборд: валюти, ставка, ринки, криптовалюта
   radar status                      стан, останній запуск, файли налаштувань
 """
 
@@ -1690,6 +1744,8 @@ def main(argv):
         digest()
     elif command == "open":
         open_report()
+    elif command == "dashboard":
+        open_dashboard()
     elif command == "gui":
         os.execv(sys.executable, [sys.executable, str(APP_DIR / "radar_gui.py")])
     elif command == "sources":

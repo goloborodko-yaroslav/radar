@@ -29,6 +29,8 @@ header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bot
 h1 { margin: 0; font-size: 22px; letter-spacing: .5px; display: flex; align-items: center; gap: 10px; }
 h1 svg { width: 30px; height: 30px; }
 .stamp { color: var(--muted); font-size: 14px; }
+.nav-link { font-size: 14px; color: var(--muted); text-decoration: none; border: 1px solid var(--line); border-radius: 8px; padding: 2px 9px; white-space: nowrap; }
+.nav-link:hover { color: inherit; border-color: var(--muted); }
 .tabs { display: flex; gap: 4px; margin-left: auto; background: var(--card); border: 1px solid var(--line);
         border-radius: 10px; padding: 3px; }
 .tab { border: 0; background: none; padding: 5px 14px; border-radius: 7px; cursor: pointer; font-size: 15px; }
@@ -93,6 +95,7 @@ footer { font-size: 13px; padding: 24px 0 40px; }
   <div class="top">
     <h1>__LOGO__Radar</h1>
     <span class="stamp">Оновлено __UPDATED__ · за __DAYS__</span>
+    <a class="nav-link" href="dashboard.html" title="Курси валют, облікова ставка, ринки, криптовалюта">Дашборд ↗</a>
     <nav class="tabs">
       <button class="tab on" data-view="feed">Стрічка<span class="n" id="n-feed"></span></button>
       <button class="tab" data-view="important">Важливе<span class="n" id="n-important"></span></button>

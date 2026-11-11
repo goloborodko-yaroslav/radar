@@ -158,8 +158,12 @@ class NewsPage(Gtk.Box):
         self.refresh.connect("clicked", self.on_refresh)
         open_button = Gtk.Button(label="Відкрити список новин")
         open_button.connect("clicked", lambda _b: radar.open_report())
+        dashboard_button = Gtk.Button(label="Дашборд")
+        dashboard_button.set_tooltip_text("Курси валют, облікова ставка, ринки, криптовалюта")
+        dashboard_button.connect("clicked", lambda _b: in_background(radar.open_dashboard, lambda *_: None))
         buttons.pack_start(self.refresh, False, False, 0)
         buttons.pack_start(open_button, False, False, 0)
+        buttons.pack_start(dashboard_button, False, False, 0)
         self.spinner = Gtk.Spinner()
         buttons.pack_start(self.spinner, False, False, 0)
         self.message = Gtk.Label(xalign=0)
@@ -212,7 +216,7 @@ class NewsPage(Gtk.Box):
         if error:
             self.message.set_text(f"Помилка: {error}")
         elif result is None:
-            self.message.set_text("Radar саме оновлює новини за розкладом. Спробуйте за хвилину.")
+            self.message.set_text("Не оновлено: немає інтернету або Radar саме оновлює новини за розкладом.")
         else:
             self.message.set_text("")  # підсумок оновлення показує рядок «Останнє оновлення»
         self.update_status()

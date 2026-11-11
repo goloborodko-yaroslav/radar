@@ -8,8 +8,8 @@ BIN="$HOME/.local/bin"
 APPS="$HOME/.local/share/applications"
 
 mkdir -p "$APP/defaults" "$BIN" "$APPS"
-cp "$SRC/radar.py" "$SRC/radar_gui.py" "$SRC/report_template.html" "$SRC/radar.svg" "$SRC/uninstall.sh" "$SRC/README.md" "$APP/"
-cp "$SRC/defaults/sources.json" "$SRC/defaults/topics.txt" "$APP/defaults/"
+cp "$SRC/radar.py" "$SRC/radar_gui.py" "$SRC/dashboard.py" "$SRC/dashboard_template.html" "$SRC/report_template.html" "$SRC/radar.svg" "$SRC/uninstall.sh" "$SRC/README.md" "$APP/"
+cp "$SRC/defaults/sources.json" "$SRC/defaults/topics.txt" "$SRC/defaults/dashboard.json" "$APP/defaults/"
 chmod +x "$APP/radar.py" "$APP/radar_gui.py" "$APP/uninstall.sh"
 ln -sf "$APP/radar.py" "$BIN/radar"
 
@@ -26,11 +26,15 @@ StartupWMClass=Radar
 StartupNotify=true
 Categories=Network;News;
 Keywords=news;новини;фінанси;radar;
-Actions=open;run;
+Actions=open;dashboard;run;
 
 [Desktop Action open]
 Name=Відкрити список новин
 Exec=/usr/bin/python3 $APP/radar.py open
+
+[Desktop Action dashboard]
+Name=Дашборд: валюти й ринки
+Exec=/usr/bin/python3 $APP/radar.py dashboard
 
 [Desktop Action run]
 Name=Оновити новини зараз

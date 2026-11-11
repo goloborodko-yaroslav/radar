@@ -14,6 +14,7 @@
 | Де працює | GitHub Actions за розкладом | на комп'ютері, таймер systemd |
 | Налаштування | тека [`config/radar`](config/radar) | `~/.config/radar` або вікно програми |
 | Сповіщення | немає | так, вмикаються у вікні |
+| Дашборд (курси, ставка, ринки, крипта) | `dashboard.html` поруч зі сторінкою | так, кнопка «Дашборд» |
 
 Обидві запускають [`radar/radar.py`](radar/radar.py). Він написаний на Python 3 і використовує
 лише стандартну бібліотеку, тож додаткові пакети не потрібні.
@@ -64,10 +65,11 @@ docs/                  документація
 ## In English (summary)
 
 Radar is a rule-based (no AI) news aggregator for Ukrainian business and finance readers. It
-fetches RSS feeds and scraped pages from 37 outlets, keeps the items that match 189 keyword-defined
+fetches RSS feeds and scraped pages from 38 outlets, keeps the items that match 189 keyword-defined
 topics, translates foreign headlines into Ukrainian via Google Translate, clusters the same event
 across outlets into one "story", and flags stories the outlets themselves present as top news. The
-output is a single static HTML page.
+output is a static HTML news page plus a market dashboard page (UAH rates, NBU policy rate and
+reserves, indices, commodities, stocks, crypto).
 
 - Core: `radar/radar.py`, Python 3.10+, standard library only (sqlite3, urllib, html.parser).
 - Desktop app: GTK 3 settings window (`radar/radar_gui.py`), systemd user timers, D-Bus

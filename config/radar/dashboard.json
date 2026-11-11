@@ -1,0 +1,26 @@
+{
+  "_help": "Інструменти дашборда Radar. markets — коди котирувань CNBC (індекси з крапкою, ф'ючерси з @, акції — тикер). crypto — ідентифікатори CoinGecko.",
+  "markets": [
+    {"group": "Індекси", "items": [
+      {"symbol": ".SPX", "name": "S&P 500"},
+      {"symbol": ".IXIC", "name": "Nasdaq"},
+      {"symbol": ".DJI", "name": "Dow Jones"},
+      {"symbol": ".STOXX50E", "name": "Euro Stoxx 50"},
+      {"symbol": ".GDAXI", "name": "DAX"}
+    ]},
+    {"group": "Сировина", "items": [
+      {"symbol": "@LCO.1", "name": "Нафта Brent"},
+      {"symbol": "@GC.1", "name": "Золото"}
+    ]},
+    {"group": "Акції", "items": [
+      {"symbol": "NVDA", "name": "Nvidia"},
+      {"symbol": "AAPL", "name": "Apple"},
+      {"symbol": "MSFT", "name": "Microsoft"},
+      {"symbol": "GOOGL", "name": "Google (Alphabet)"},
+      {"symbol": "AMZN", "name": "Amazon"},
+      {"symbol": "SPCX", "name": "SpaceX"},
+      {"symbol": "META", "name": "Meta"}
+    ]}
+  ],
+  "crypto": ["bitcoin", "ethereum"]
+}

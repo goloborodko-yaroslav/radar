@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar — дашборд</title>
+<link rel="icon" type="image/svg+xml" href="__FAVICON__">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f4f4f4; --card: #ffffff; --text: #0a0a0a; --muted: #6b6b6b; --line: #e2e2e2;
+  --accent: #000000; --on-accent: #ffffff; --tag: #efefef;
+  --up: #b42318; --down: #1a7f37; --spark: #0a0a0a; --fill: rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000; --card: #0c0c0c; --text: #f2f2f2; --muted: #8c8c8c; --line: #222222;
+    --accent: #ffffff; --on-accent: #000000; --tag: #1a1a1a;
+    --up: #ff7b72; --down: #56d364; --spark: #f2f2f2; --fill: rgba(255,255,255,.07);
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+       font: 16px/1.45 "Ubuntu", "Noto Sans", system-ui, sans-serif; }
+a { color: inherit; }
+header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+.top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 0 12px; }
+h1 { margin: 0; font-size: 22px; letter-spacing: .5px; display: flex; align-items: center; gap: 10px; }
+h1 svg { width: 30px; height: 30px; }
+h1 small { font-weight: 400; color: var(--muted); font-size: 18px; }
+.stamp { color: var(--muted); font-size: 14px; }
+.nav-link { font-size: 14px; color: var(--muted); text-decoration: none; border: 1px solid var(--line); border-radius: 8px; padding: 2px 9px; margin-left: auto; }
+.nav-link:hover { color: inherit; border-color: var(--muted); }
+h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin: 26px 0 10px; }
+h3 { font-size: 13px; color: var(--muted); font-weight: 500; margin: 14px 0 8px; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.grid.two { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.label { font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600;
+         display: flex; justify-content: space-between; gap: 8px; }
+.big { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.3px; margin-top: 2px; }
+.big small { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 4px; letter-spacing: 0; }
+.val { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.sub { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; display: flex; gap: 10px; flex-wrap: wrap; }
+.up { color: var(--up); } .down { color: var(--down); }
+.badge { font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; background: var(--accent);
+         color: var(--on-accent); border-radius: 4px; padding: 1px 6px; }
+svg.spark { display: block; width: 100%; height: 40px; margin-top: 10px; }
+.axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
+.rates { width: 100%; border-collapse: collapse; margin-top: 12px; font-variant-numeric: tabular-nums; }
+.rates th { text-align: right; font-size: 12px; font-weight: 500; color: var(--muted); padding: 0 0 4px 10px; }
+.rates th:first-child, .rates td:first-child { text-align: left; padding-left: 0; }
+.rates td { text-align: right; padding: 7px 0 7px 10px; border-top: 1px solid var(--line); font-size: 15px; }
+.rates td:first-child { color: var(--muted); font-size: 14px; }
+.rates td small { display: block; font-size: 11.5px; color: var(--muted); }
+.note { color: var(--muted); font-size: 13px; }
+footer { color: var(--muted); font-size: 13px; padding: 28px 0 40px; }
+footer .err { color: var(--up); }
+@media (max-width: 640px) { .grid.two { grid-template-columns: 1fr; } .big { font-size: 24px; } }
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="top">
+  <h1>__LOGO__Radar <small>· дашборд</small></h1>
+  <span class="stamp">Оновлено __UPDATED__</span>
+  <a class="nav-link" href="report.html">← Новини</a>
+</div></div></header>
+<main class="wrap" id="main"></main>
+<script>
+var DATA = __DATA__;
+(function () {
+  var C = DATA.cache || {};
+  var fmt = function (v, d) { return v == null || isNaN(v) ? '—' : Number(v).toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var signed = function (v, d) { return v == null ? '' : (v > 0 ? '+' : v < 0 ? '−' : '±') + fmt(Math.abs(v), d); };
+  // up — червоний, down — зелений. Для гривні зростання курсу — погано; для ринків (inverse) навпаки
+  var cls = function (v, inverse) { if (!v) return ''; return (v > 0) !== !!inverse ? 'up' : 'down'; };
+  var dmy = function (s) { var p = s.slice(0, 10).split('-'); return p[2] + '.' + p[1]; };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function spark(vals, bars, titles) {
+    vals = (vals || []).filter(function (v) { return v != null && !isNaN(v); });
+    if (vals.length < 2) return '';
+    var w = 300, h = 40, p = 2, min = Math.min.apply(null, vals), max = Math.max.apply(null, vals), span = max - min || 1;
+    if (bars) {
+      var bw = (w - 2 * p) / vals.length, base = min - span * 0.25;
+      return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' + vals.map(function (v, i) {
+        var bh = Math.max(2, (v - base) / (max - base) * (h - 2));
+        return '<rect x="' + (p + i * bw + 1.5) + '" y="' + (h - bh) + '" width="' + (bw - 3) + '" height="' + bh + '" rx="1.5" fill="var(--spark)" opacity="' + (i === vals.length - 1 ? .9 : .3) + '">' +
+          (titles ? '<title>' + esc(titles[i]) + '</title>' : '') + '</rect>';
+      }).join('') + '</svg>';
+    }
+    var x = function (i) { return p + i * (w - 2 * p) / (vals.length - 1); };
+    var y = function (v) { return h - p - (v - min) / span * (h - 2 * p); };
+    var pts = vals.map(function (v, i) { return x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(' ');
+    return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">' +
+      '<polygon points="' + p + ',' + h + ' ' + pts + ' ' + (w - p) + ',' + h + '" fill="var(--fill)"/>' +
+      '<polyline points="' + pts + '" fill="none" stroke="var(--spark)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
+      '<circle cx="' + x(vals.length - 1) + '" cy="' + y(vals[vals.length - 1]) + '" r="2.5" fill="var(--spark)"/></svg>';
+  }
+
+  // ---------------------------------------------------------- гривня
+  function currency(cc, title) {
+    var off = (C.official || {})[cc], ib = (C.interbank || {})[cc], cash = (C.cash || {})[cc];
+    var h = '<div class="card"><div class="label"><span>' + title + '</span>';
+    var last, prev;
+    if (off && off.series.length) {
+      last = off.series[off.series.length - 1]; prev = off.series[off.series.length - 2] || last;
+      if (last[1] >= off.max[1] - 1e-9) h += '<span class="badge">рекорд</span>';
+      h += '</div><div class="big">' + fmt(last[1], 4) + '<small>грн · НБУ на ' + dmy(last[0]) + '</small></div>';
+      var d30 = off.series.filter(function (r) { return (new Date(last[0]) - new Date(r[0])) / 864e5 <= 30; })[0] || off.series[0];
+      h += '<div class="sub"><span class="' + cls(last[1] - prev[1]) + '">' + signed(last[1] - prev[1], 4) + ' за день</span>' +
+           '<span class="' + cls(last[1] - d30[1]) + '">' + signed(last[1] - d30[1], 2) + ' за 30 днів</span>' +
+           '<span>рекорд ' + fmt(off.max[1], 4) + ' (' + dmy(off.max[0]) + '.' + off.max[0].slice(0, 4) + ')</span></div>';
+      h += spark(off.series.slice(-90).map(function (r) { return r[1]; }));
+    } else h += '</div><div class="big">—</div>';
+    h += '<table class="rates"><tr><th></th><th>Купівля</th><th>Продаж</th><th>Середній</th></tr>';
+    if (ib && ib.today && ib.today.length) {
+      var t = ib.today[ib.today.length - 1], o = ib.today[0], mid = (t[1] + t[2]) / 2, omid = (o[1] + o[2]) / 2;
+      h += '<tr><td>Міжбанк<small>о ' + t[0].slice(11, 16) + ' · ' + dmy(t[0]) + '</small></td><td>' + fmt(t[1], 4) + '</td><td>' + fmt(t[2], 4) +
+           '</td><td>' + fmt(mid, 4) + '<small class="' + cls(mid - omid) + '">' + signed(mid - omid, 4) + ' з відкриття</small></td></tr>';
+    } else h += '<tr><td>Міжбанк</td><td colspan="3">немає даних</td></tr>';
+    if (cash && cash.banks) {
+      h += '<tr><td>Банки, середній</td><td>' + fmt(cash.banks[0], 2) + '</td><td>' + fmt(cash.banks[1], 2) +
+           '</td><td>' + fmt((cash.banks[0] + cash.banks[1]) / 2, 2) + '</td></tr>';
+      h += '<tr><td>Готівковий ринок</td><td>' + fmt(cash.market[0], 2) + '</td><td>' + fmt(cash.market[1], 2) +
+           '</td><td>' + fmt((cash.market[0] + cash.market[1]) / 2, 2) + '<small class="' + cls(cash.market_change[1]) + '">' +
+           signed(cash.market_change[1], 2) + ' продаж за день</small></td></tr>';
+    } else h += '<tr><td>Банки й ринок</td><td colspan="3">немає даних</td></tr>';
+    if (last && cash && cash.market) {
+      var gap = (cash.market[0] + cash.market[1]) / 2 - last[1];
+      h += '<tr><td>Різниця ринок — НБУ</td><td colspan="3">' + signed(gap, 2) + ' грн (' + signed(gap / last[1] * 100, 1) + '%)</td></tr>';
+    }
+    return h + '</table></div>';
+  }
+
+  function keyRate() {
+    var k = C.key || [];
+    if (!k.length) return '<div class="card"><div class="label">Облікова ставка НБУ</div><div class="val">—</div></div>';
+    var last = k[k.length - 1], i = k.length - 1;
+    while (i > 0 && k[i - 1][1] === last[1]) i--;
+    var before = k[i - 1];
+    return '<div class="card"><div class="label">Облікова ставка НБУ</div><div class="big">' + fmt(last[1], 1) + '%</div>' +
+      '<div class="sub">' + (before ? '<span class="' + cls(last[1] - before[1]) + '">' + signed(last[1] - before[1], 1) + ' п.п.</span><span>було ' + fmt(before[1], 1) + '% на ' + dmy(before[0]) + '</span>'
+        : '<span>без змін з ' + dmy(k[0][0]) + '</span>') + '</div>' + spark(k.map(function (r) { return r[1]; })) + '</div>';
+  }
+
+  var MONTHS_SHORT = ['січ', 'лют', 'бер', 'кві', 'тра', 'чер', 'лип', 'сер', 'вер', 'жов', 'лис', 'гру'];
+  var MONTHS_GEN = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+
+  function reserves() {
+    var r = C.reserves || [];
+    if (!r.length) return '<div class="card"><div class="label">Міжнародні резерви</div><div class="val">—</div></div>';
+    // НБУ публікує резерви раз на місяць, станом на 1-ше число; кожен стовпчик — один місяць
+    var last = r[r.length - 1], prev = r[r.length - 2] || last, d = (last[1] - prev[1]) / 1000;
+    var month = function (x, short) {
+      var m = +x[0].slice(5, 7) - 1, y = x[0].slice(0, 4);
+      return short ? MONTHS_SHORT[m] + ' ' + y.slice(2) : '1 ' + MONTHS_GEN[m] + ' ' + y;
+    };
+    var mid = r[Math.floor((r.length - 1) / 2)];
+    return '<div class="card"><div class="label">Міжнародні резерви</div><div class="big">$' + fmt(last[1] / 1000, 1) +
+      '<small>млрд · на ' + month(last) + '</small></div>' +
+      '<div class="sub"><span class="' + cls(d, true) + '">' + signed(d, 2) + ' млрд за місяць</span>' +
+      '<span>на графіку — по місяцях, ' + r.length + ' міс.</span></div>' +
+      spark(r.map(function (x) { return x[1]; }), true, r.map(function (x) { return month(x) + ': $' + fmt(x[1] / 1000, 1) + ' млрд'; })) +
+      '<div class="axis"><span>' + month(r[0], true) + '</span><span>' + month(mid, true) + '</span><span>' + month(last, true) + '</span></div></div>';
+  }
+
+  // ---------------------------------------------------------- ринки
+  function markets() {
+    var q = C.quotes || {}, bars = C.bars || {}, h = '';
+    (DATA.markets || []).forEach(function (g) {
+      h += '<h3>' + esc(g.group) + '</h3><div class="grid">';
+      g.items.forEach(function (it) {
+        var x = q[it.symbol];
+        h += '<div class="card"><div class="label"><span>' + esc(it.name) + '</span><span>' + esc(x ? x.currency : '') + '</span></div>';
+        if (!x) { h += '<div class="val">—</div></div>'; return; }
+        h += '<div class="val">' + fmt(x.last, x.last > 1000 ? 0 : 2) + '</div><div class="sub"><span class="' + cls(x.pct, true) + '">' +
+             signed(x.pct, 2) + '%</span><span>' + esc(String(x.time).slice(0, 10)) + '</span></div>';
+        h += spark((bars[it.symbol] || []).map(function (b) { return b[1]; })) + '</div>';
+      });
+      h += '</div>';
+    });
+    return h;
+  }
+
+  function crypto() {
+    var c = C.crypto || {}, h = '';
+    if (c.global) {
+      h += '<p class="note">Капіталізація ринку $' + fmt(c.global.cap / 1e12, 2) + ' трлн · <span class="' + cls(c.global.change, true) + '">' +
+           signed(c.global.change, 2) + '% за добу</span> · частка біткоїна ' + fmt(c.global.btc, 1) + '%</p>';
+    }
+    h += '<div class="grid">';
+    (c.coins || []).forEach(function (x) {
+      h += '<div class="card"><div class="label"><span>' + esc(x.name) + '</span><span>' + esc(x.symbol) + '</span></div>' +
+        '<div class="val">$' + fmt(x.price, x.price >= 100 ? 0 : x.price >= 1 ? 2 : 4) + '</div>' +
+        '<div class="sub"><span class="' + cls(x.d1, true) + '">' + signed(x.d1, 2) + '% доба</span><span class="' + cls(x.d7, true) + '">' +
+        signed(x.d7, 2) + '% тиждень</span></div>' + spark(x.spark) + '</div>';
+    });
+    return h + '</div>';
+  }
+
+  var labels = { official: 'НБУ: офіційний курс', key: 'НБУ: облікова ставка', reserves: 'НБУ: резерви',
+                 interbank: 'Мінфін: міжбанк', cash: 'Мінфін: банки й готівковий ринок', quotes: 'CNBC: котирування',
+                 bars: 'CNBC: графіки', crypto: 'CoinGecko' };
+  var errs = Object.keys(C.errors || {});
+  document.getElementById('main').innerHTML =
+    '<h2>Гривня</h2><div class="grid two">' + currency('usd', 'Долар США') + currency('eur', 'Євро') + '</div>' +
+    '<h2>Національний банк</h2><div class="grid two">' + keyRate() + reserves() + '</div>' +
+    '<h2>Світові ринки</h2>' + markets() +
+    '<h2>Криптовалюта</h2>' + crypto() +
+    '<footer>Джерела: НБУ (офіційний курс, облікова ставка, резерви), Мінфін (міжбанк, середній курс у банках, готівковий ринок), ' +
+    'CNBC (індекси, сировина, акції; закриття попереднього дня або із затримкою), CoinGecko (криптовалюта). ' +
+    'Оновлюється разом із новинами Radar. Склад інструментів — у файлі ~/.config/radar/dashboard.json.' +
+    (errs.length ? '<br><span class="err">Не вдалося оновити: ' + errs.map(function (e) { return esc(labels[e] || e) + ' (' + esc(C.errors[e]) + ')'; }).join('; ') + '. Показано останні отримані дані.</span>' : '') +
+    '</footer>';
+})();
+</script>
+</body>
+</html>

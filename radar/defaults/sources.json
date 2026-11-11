@@ -1,5 +1,12 @@
 [
   {
+    "name": "Dilo",
+    "url": "https://delo.ua/",
+    "type": "html",
+    "link_regex": "delo\\.ua/news/.{8,}",
+    "enabled": true
+  },
+  {
     "name": "Мінфін",
     "url": "https://minfin.com.ua/ua/news/",
     "type": "html",

@@ -48,6 +48,14 @@ jobs:
           key: radar-db-${{ github.run_id }}
           restore-keys: radar-db-
 
+      # Дані дашборда — окремим кешем, щоб не чіпати кеш бази
+      - name: Restore dashboard data
+        uses: actions/cache/restore@v4
+        with:
+          path: .data/radar/dashboard.json
+          key: radar-dash-${{ github.run_id }}
+          restore-keys: radar-dash-
+
       - name: Collect news
         run: python3 radar/radar.py run --no-notify
 
@@ -58,10 +66,19 @@ jobs:
           path: .data/radar/radar.db
           key: radar-db-${{ github.run_id }}-${{ github.run_attempt }}
 
+      - name: Save dashboard data
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .data/radar/dashboard.json
+          key: radar-dash-${{ github.run_id }}-${{ github.run_attempt }}
+
       - name: Prepare page
         run: |
           mkdir -p site
           cp "$XDG_DATA_HOME/radar/report.html" site/index.html
+          # Дашборд (курси, ставка, ринки, крипта); посилання «Дашборд ↗» веде саме сюди
+          cp "$XDG_DATA_HOME/radar/dashboard.html" site/dashboard.html || true
           touch site/.nojekyll
           tail -n 20 "$XDG_DATA_HOME/radar/radar.log" || true
 
