@@ -77,6 +77,8 @@ jobs:
         run: |
           mkdir -p site
           cp "$XDG_DATA_HOME/radar/report.html" site/index.html
+          # Під цією назвою на неї посилається кнопка «← Новини» на дашборді
+          cp "$XDG_DATA_HOME/radar/report.html" site/report.html
           # Дашборд (курси, ставка, ринки, крипта); посилання «Дашборд ↗» веде саме сюди
           cp "$XDG_DATA_HOME/radar/dashboard.html" site/dashboard.html || true
           touch site/.nojekyll
